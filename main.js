@@ -29,15 +29,22 @@ ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scoupe*/
     this.width = width;
     this.height = height;
     this.board = board;
-
     // Accedo al board accedo al elemento bar y le agrego este objeto Bar
     this.board.bars.push(this);
     this.kind = "rectangle";
+    this.speed = 10;
   };
 
   self.Bar.prototype = {
-    down: function () {},
-    up: function () {},
+    down: function () {
+      this.y += this.speed;
+    },
+    up: function () {
+      this.x -= this.speed;
+    },
+    toString: function () {
+      return "x: " + this.x + " y: " + this.y;
+    },
   };
 })();
 
@@ -72,14 +79,25 @@ ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scoupe*/
   }
 })();
 
+// Instancias
+var board = new Board(800, 400);
+var bar = new Bar(20, 100, 40, 100, board);
+var bar = new Bar(735, 100, 40, 100, board);
+var canvas = document.getElementById("canvas");
+var board_view = new BoardView(canvas, board);
+
+// Para poder mover las barras se coloca el evento sobre el todo el DOM
+document.addEventListener("keydown", function (evento) {
+  if (evento.keyCode == 38) {
+    bar.up();
+  } else if (evento.keyCode == 40) {
+    bar.down();
+  }
+});
+
 self.addEventListener("load", main);
 
 //CONTROLADOR: Ejecutara todos los elementos y pasa los parametros a la vista y modelo
 function main() {
-  var board = new Board(800, 400);
-  var bar = new Bar(20, 100, 40, 100, board);
-  var bar = new Bar(735, 100, 40, 100, board);
-  var canvas = document.getElementById("canvas");
-  var board_view = new BoardView(canvas, board);
   board_view.draw();
 }
