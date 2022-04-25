@@ -10,12 +10,13 @@ ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scoupe*/
     this.game_over = false;
     this.bars = [];
     this.ball = null;
+    this.playing = false;
   };
 
   self.Board.prototype = {
     //    Retorna las barras y la pelota
     get elements() {
-      var elements = this.bars;
+      var elements = this.bars.map(function(bar){ return bar; });
       elements.push(this.ball);
       return elements;
     },
@@ -31,9 +32,20 @@ ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scoupe*/
     this.speed_y = 0;
     this.speed_x = 3;
     this.board = board;
+    this.direction = 1;
+
     board.ball = this;
     this.kind = "circle";
-  };
+  }
+
+  // Para que la pelota se mueva
+  self.Ball.prototype = {
+    move: function(){
+        this.x += (this.speed_x * this.direction);
+        this.y += (this.spped_y);
+        },
+    }
+  
 })();
 
 (function () {
@@ -49,6 +61,7 @@ ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scoupe*/
     this.speed = 10;
   };
 
+//   Para que las barras se muevan
   self.Bar.prototype = {
     down: function () {
       this.y += this.speed;
@@ -87,8 +100,12 @@ ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scoupe*/
     },
 
     play: function () {
-      this.clean();
-      this.draw();
+        if(this.board.playing){
+            this.clean();
+            this.draw();
+            this.board.ball.move();
+
+        }
     },
   };
 
@@ -124,21 +141,25 @@ document.addEventListener("keydown", function (event) {
     event.preventDefault();
     bar.down();
   } else if (event.keyCode === 87) {
-    // W
+    // w
     event.preventDefault();
-    bar_2.up();
+    bar2.up();
   } else if (event.keyCode === 83) {
     // S
     event.preventDefault();
-    bar_2.down();
+    bar2.down();
   } else if (event.keyCode === 32) {
-    // PAUSE
+    // PAUSE barraespaciadora
     event.preventDefault();
     board.playing = !board.playing;
   }
 });
 
+board_view.draw();
 window.requestAnimationFrame(controller);
+setTimeout(function(){
+    ball.direction = -1;
+},4000);
 //CONTROLADOR: Ejecutara todos los elementos y pasa los parametros a la vista y modelo
 function controller() {
   board_view.play();
