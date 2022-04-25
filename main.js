@@ -1,8 +1,8 @@
-/* Creacion de uno de los objetos, esta dentro de una funcion anonima que se 
-ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scoupe*/
+/* Creación de uno de los objetos, esta dentro de una función anónima que se 
+ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scope*/
 // MODELO
 (function () {
-  // Esta variable Board es el pizzarron
+  // Esta variable Board es el pizarrón
   self.Board = function (width, height) {
     this.width = width;
     this.height = height;
@@ -23,7 +23,7 @@ ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scoupe*/
   };
 })();
 
-// Funcion de la pelota
+// Función de la pelota
 (function () {
   self.Ball = function (x, y, radius, board) {
     this.x = x;
@@ -42,7 +42,7 @@ ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scoupe*/
   self.Ball.prototype = {
     move: function(){
         this.x += (this.speed_x * this.direction);
-        this.y += (this.spped_y);
+        this.y += (this.speed_y);
         },
     }
   
@@ -77,7 +77,7 @@ ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scoupe*/
 
 // VISTA
 (function () {
-  /*La vista del canvas dependera de las propiedades de  width y heigth que se le asigne*/
+  /*La vista del canvas dependerá de las propiedades de  width y height que se le asigne*/
   self.BoardView = function (canvas, board) {
     this.canvas = canvas;
     this.canvas.width = board.width;
@@ -132,6 +132,7 @@ var bar2 = new Bar(735, 100, 40, 100, board);
 var canvas = document.getElementById("canvas");
 var board_view = new BoardView(canvas, board);
 var ball = new Ball(350, 100, 10 , board);
+
 // Para poder mover las barras se coloca el evento sobre el todo el DOM
 document.addEventListener("keydown", function (event) {
   if (event.keyCode === 38) {
@@ -149,7 +150,7 @@ document.addEventListener("keydown", function (event) {
     event.preventDefault();
     bar2.down();
   } else if (event.keyCode === 32) {
-    // PAUSE barraespaciadora
+    // PAUSE barra espaciador
     event.preventDefault();
     board.playing = !board.playing;
   }
@@ -160,7 +161,8 @@ window.requestAnimationFrame(controller);
 setTimeout(function(){
     ball.direction = -1;
 },4000);
-//CONTROLADOR: Ejecutara todos los elementos y pasa los parametros a la vista y modelo
+
+//CONTROLADOR: Ejecutara todos los elementos y pasa los parámetros a la vista y modelo
 function controller() {
   board_view.play();
   window.requestAnimationFrame(controller);
