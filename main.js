@@ -33,6 +33,9 @@ ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scope*/
     this.speed_x = 3;
     this.board = board;
     this.direction = 1;
+    this.bounce_angle = 0;
+    this.max_bounce_angel = Math.PI/12;
+    this.speed = 3;
 
     board.ball = this;
     this.kind = "circle";
@@ -44,6 +47,27 @@ ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scope*/
         this.x += (this.speed_x * this.direction);
         this.y += (this.speed_y);
         },
+
+        get width(){
+          return this.radius*2;
+        },
+
+        get height(){
+          return this.radius*2;
+        },
+
+        collision: function(bar){
+          // Reacciona a la colisión con una barra que recibe como parámetro
+          var relative_intersect_y = (bar.y + (bar.height/2)) - this.y;
+          var normalized_intersect_y = relative_intersect_y/(bar.height/2);
+          this.bounce_angle = normalized_intersect_y * this.max_bounce_angel;
+          // Angulo de mov de la ball, segun la barra
+          this.speed_y = this.speed * -Math.sin(this.bounce_angle);
+          this.speed_x = this.speed * Math.cos(this.bounce_angle);
+          // Cambia dirección
+          if(this.x > (this.board.width/2)) this,direction = -1;
+          else this.direction = 1;
+        }
     }
   
 })();
@@ -99,15 +123,47 @@ ejecuta asi MediaStreamAudioDestinationNode, para no contaminar el scope*/
       }
     },
 
+    // Choque de la bola
+    check_collisions: function(){
+      for (var i = this.board.bars.length -1; i >= 0; i--){
+        var bar = this.board.bars[i];
+        if(hit(bar, this.board.ball)){
+          this.board.ball.collision(bar);
+        }
+      }
+    },
+    // Funcion inicia juego
     play: function () {
         if(this.board.playing){
             this.clean();
             this.draw();
+            this.check_collisions();
             this.board.ball.move();
-
         }
-    },
+    }
   };
+
+  function hit(a, b){
+    // Revisa si a colisiona con b
+    var hit = false;
+    // Colisiones horizontales
+    if(b.x + b.width >= a.x && b.x < a.x + a.width){
+      // Colisiones verticales
+      if(b.y + b.height >= a.y && b.y < a.y +a.height)
+      hit = true;
+    }
+    // Colision de a con b
+    if (b.x <= a.x && b.x + b.width >= a.x + a.width){
+      if(b.y <= a.y && b.y + b.height >= a.y +a.height)
+      hit = true;
+    }
+    // Colision de b con a
+    if (a.x <= b.x && a.x + a.width >= b.x + b.width){
+      if (a.y <= b.y && a.y +a.height >= b.y + b.height)
+      hit = true;
+    }
+    return hit;
+  }
 
 //   Dibuja barras y bola con canvas
   function draw(ctx, element) {
@@ -158,9 +214,7 @@ document.addEventListener("keydown", function (event) {
 
 board_view.draw();
 window.requestAnimationFrame(controller);
-setTimeout(function(){
-    ball.direction = -1;
-},4000);
+
 
 //CONTROLADOR: Ejecutara todos los elementos y pasa los parámetros a la vista y modelo
 function controller() {
